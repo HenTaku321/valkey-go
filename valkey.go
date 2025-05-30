@@ -2,6 +2,7 @@ package valkey
 
 import (
 	"context"
+	"crypto/tls"
 	"github.com/valkey-io/valkey-go"
 	"time"
 )
