@@ -11,13 +11,14 @@ type Client struct {
 	Ctx context.Context
 }
 
-func NewClient(address, password string, db int, forceSingleClient bool) (*Client, error) {
-	client, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{address}, Password: password, SelectDB: db, ForceSingleClient: forceSingleClient})
+// NewClient 若启用 tls 但无更多配置需传入 &tls.Config{} 而不是 nil
+func NewClient(address, password string, db int, forceSingleClient bool, tlsConfig *tls.Config) (*valkey.Client, error) {
+	client, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{address}, Password: password, SelectDB: db, ForceSingleClient: forceSingleClient, TLSConfig: tlsConfig})
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{client, context.Background()}, nil
+	return &client, nil
 }
 
 func (c *Client) Delete(key string) error {
