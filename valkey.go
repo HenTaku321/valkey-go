@@ -13,7 +13,7 @@ type Client struct {
 }
 
 // NewClient 若启用 tls 但无更多配置需传入 &tls.Config{} 而不是 nil
-func NewClient(address, password string, db int, forceSingleClient bool, tlsConfig *tls.Config) (Client, error) {
+func NewClient(address, password string, db int, forceSingleClient bool, tlsConfig *tls.Config) (*Client, error) {
 	client, err := valkey.NewClient(valkey.ClientOption{InitAddress: []string{address}, Password: password, SelectDB: db, ForceSingleClient: forceSingleClient, TLSConfig: tlsConfig})
 	if err != nil {
 		return nil, err
