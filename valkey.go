@@ -27,7 +27,7 @@ func (c *Client) Delete(key string) error {
 }
 
 func (c *Client) SetString(key, value string, ex *time.Duration) error {
-	var cmd valkey.Completed
+	cmd := valkey.Completed{}
 
 	if ex != nil {
 		cmd = c.C.B().Set().Key(key).Value(value).Ex(*ex).Build()
@@ -69,11 +69,11 @@ func (c *Client) GetInt64(key string) (int64, error) {
 	return resp.AsInt64()
 }
 
-func (c *Client) SetSlice(key string, value []string) error {
+func (c *Client) AppendSlice(key string, value []string) error {
 	return c.C.Do(c.Ctx, c.C.B().Rpush().Key(key).Element(value...).Build()).Error()
 }
 
-func (c *Client) SetSlicePrepend(key string, value []string) error {
+func (c *Client) AppendSliceReverse(key string, value []string) error {
 	return c.C.Do(c.Ctx, c.C.B().Lpush().Key(key).Element(value...).Build()).Error()
 }
 
@@ -186,6 +186,24 @@ func (c *Client) GetMapAll(key string) (map[string]string, error) {
 	res, err := resp.AsStrMap()
 	if err != nil {
 		return nil, err
+	}
+
+	return res, nil
+}
+
+func (c *Client) GetMapLen(key string) (int64, error) {
+	resp := c.C.Do(c.Ctx, c.C.B().Hlen().Key(key).Build())
+
+	if err := resp.Error(); err != nil {
+		if valkey.IsValkeyNil(err) {
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	res, err := resp.AsInt64()
+	if err != nil {
+		return 0, err
 	}
 
 	return res, nil
